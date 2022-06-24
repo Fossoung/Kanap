@@ -1,13 +1,16 @@
 // pour différancier la page confirmation et panier
 const page = document.location.href;
-// appel API
+//----------------------------------------------------------------
+// Récupération des produits de l'api
+//----------------------------------------------------------------
+// appel de la ressource api product (voir script.js) si on est sur la page panier
 if (page.match("cart")) {
 fetch("http://localhost:3000/api/products")
   .then((res) => res.json())
-  .then((datakanap) => {
-      console.log(datakanap);
+  .then((objetProduits) => {
+      console.log(objetProduits);
       // appel de la fonction affichagePanier
-      affichagePanier(datakanap);
+      affichagePanier(objetProduits);
   })
   .catch((err) => {
       document.querySelector("#cartAndFormContainer").innerHTML = "<h1>erreur 404</h1>";
@@ -16,8 +19,9 @@ fetch("http://localhost:3000/api/products")
 } else {
   console.log("sur page confirmation");
 }
+//--------------------------------------------------------------
 // Fonction détermine les conditions d'affichage des produits du panier
-
+//--------------------------------------------------------------
 function affichagePanier(index) {
   // on récupère le panier converti
   let panier = JSON.parse(localStorage.getItem("panierStocké"));
@@ -49,9 +53,9 @@ function affichagePanier(index) {
   modifQuantité();
   suppression();
 }
-
+//--------------------------------------------------------------
 //Fonction d'affichage d'un panier (tableau)
-
+//--------------------------------------------------------------
 function affiche(indexé) {
   // on déclare et on pointe la zone d'affichage
   let zonePanier = document.querySelector("#cart__items");
@@ -82,10 +86,14 @@ function affiche(indexé) {
   // reste à l'écoute des modifications de quantité pour l'affichage et actualiser les données
   totalProduit();
 }
-
+//--------------------------------------------------------------
 // fonction modifQuantité on modifie dynamiquement les quantités du panier
+//--------------------------------------------------------------
 function modifQuantité() {
   const cart = document.querySelectorAll(".cart__item");
+  /* manière de regarder ce que l'on a d'affiché dynamiquement grace au dataset
+   cart.forEach((cart) => {console.log("item panier en dataset: " + " " + cart.dataset.id + " " + cart.dataset.couleur + " " + cart.dataset.quantité); }); */
+  // On écoute ce qu'il se passe dans itemQuantity de l'article concerné
   cart.forEach((cart) => {
     cart.addEventListener("change", (eq) => {
       // vérification d'information de la valeur du clic et son positionnement dans les articles
@@ -104,8 +112,9 @@ function modifQuantité() {
     });
   });
 }
-
+//--------------------------------------------------------------
 // fonction supression on supprime un article dynamiquement du panier et donc de l'affichage
+//--------------------------------------------------------------
 function suppression() {
   // déclaration de variables
   const cartdelete = document.querySelectorAll(".cart__item .deleteItem");
@@ -143,7 +152,9 @@ function suppression() {
     });
   });
 }
+//--------------------------------------------------------------
 // fonction ajout nombre total produit et coût total
+//--------------------------------------------------------------
 function totalProduit() {
   let panier = JSON.parse(localStorage.getItem("panierStocké"));
   // déclaration variable en tant que nombre
@@ -163,10 +174,20 @@ function totalProduit() {
   // je pointe l'endroit d'affichage du prix total
   document.getElementById("totalPrice").textContent = totalPrix;
 }
+//--------------------------------------------------------------
 //  formulaire
+//--------------------------------------------------------------
+// les données du client seront stockées dans ce tableau pour la commande sur page panier
 if (page.match("cart")) {
   var contactClient = {};
   localStorage.contactClient = JSON.stringify(contactClient);
+  // voir https://cheatography.com/davechild/cheat-sheets/regular-expressions/
+  /* regex email stackoverflow (?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]) */
+  /* équivalent en javascript à  	
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ */
+  // équivalent pour w3c /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+  // on pointe des éléments input, on attribut à certains la même classe, ils régiront pareil aux différantes regex
+  // on pointe les input nom prénom et ville
   var prenom = document.querySelector("#firstName");
   prenom.classList.add("regex_texte");
   var nom = document.querySelector("#lastName");
@@ -184,17 +205,18 @@ if (page.match("cart")) {
   // modification du type de l'input type email à text à cause d'un comportement de l'espace blanc non voulu vis à vis de la regex 
   document.querySelector("#email").setAttribute("type", "text");
 }
-
+//--------------------------------------------------------------
 //regex 
+//--------------------------------------------------------------
 // /^ début regex qui valide les caratères a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ aussi les espaces blancs et tiret \s- comprit entre 1 et 31 caratères (nombre de caractère maximum sur carte identité) {1,31} et on termine la regex $/i en indiquant que les éléments selectionnés ne sont pas sensible à la casse
 let regexLettre = /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i;
 // /^ début regex qui valide les caratères chiffre lettre et caratères spéciaux a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ aussi les espaces blancs et tiret \s- comprit entre 1 et 60 caratères (nombre de caractère maximum sur carte identité) {1,60} et on termine la regex $/i en indiquant que les éléments selectionnés ne sont pas sensible à la casse
 let regexChiffreLettre = /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i;
 let regValideEmail = /^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i;
 let regMatchEmail = /^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i;
-
+//--------------------------------------------------------------
 // Ecoute et attribution de point(pour sécurité du clic) si ces champs sont ok d'après la regex
-
+//--------------------------------------------------------------
 if (page.match("cart")) {
   regexTexte.forEach((regexTexte) =>
     regexTexte.addEventListener("input", (e) => {
@@ -223,15 +245,15 @@ if (page.match("cart")) {
     })
   );
 }
-
+//------------------------------------
 // le champ écouté via la regex regexLettre fera réagir, grâce à texteInfo, la zone concernée
-
+//------------------------------------
 texteInfo(regexLettre, "#firstNameErrorMsg", prenom);
 texteInfo(regexLettre, "#lastNameErrorMsg", nom);
 texteInfo(regexLettre, "#cityErrorMsg", ville);
-
-// attribution de point(pour sécurité du clic) si ces champs sont ok d'après la regex
-
+//--------------------------------------------------------------
+// Ecoute et attribution de point(pour sécurité du clic) si ces champs sont ok d'après la regex
+//--------------------------------------------------------------
 if (page.match("cart")) {
   let regexAdresse = document.querySelector(".regex_adresse");
   regexAdresse.addEventListener("input", (e) => {
@@ -252,18 +274,19 @@ if (page.match("cart")) {
     valideClic();
   });
 }
-
+//------------------------------------
 // le champ écouté via la regex regexChiffreLettre fera réagir, grâce à texteInfo, la zone concernée
+//------------------------------------
 texteInfo(regexChiffreLettre, "#addressErrorMsg", adresse);
-
+//--------------------------------------------------------------
 // Ecoute et attribution de point(pour sécurité du clic) si ce champ est ok d'après les regex
-
+//--------------------------------------------------------------
 if (page.match("cart")) {
   let regexEmail = document.querySelector(".regex_email");
   regexEmail.addEventListener("input", (e) => {
     // valeur sera la valeur de l'input en dynamique
     valeur = e.target.value;
- // mon adresse doit avoir cette forme pour que je puisse la valider
+    // https://webdevdesigner.com/q/what-characters-are-allowed-in-an-email-address-65767/ mon adresse doit avoir cette forme pour que je puisse la valider
     let regMatch = valeur.match(regMatchEmail);
     // quand le resultat sera correct, le console log affichera une autre réponse que null; regValide sera la valeur de la réponse regex, 0 ou -1
     let regValide = valeur.search(regValideEmail);
@@ -278,8 +301,9 @@ if (page.match("cart")) {
     valideClic();
   });
 }
-
+//------------------------------------
 // texte sous champ email
+//------------------------------------
 if (page.match("cart")) {
   email.addEventListener("input", (e) => {
     // valeur sera la valeur de l'input en dynamique
@@ -304,8 +328,9 @@ if (page.match("cart")) {
     }
   });
 }
-
+//--------------------------------------------------------------
 // fonction couleurRegex qui modifira la couleur de l'input par remplissage tapé, aide visuelle et accessibilité
+//--------------------------------------------------------------
 // on détermine une valeur de départ à valeur qui sera un string
 let valeurEcoute = "";
 // fonction à 3 arguments réutilisable, la regex, la valeur d'écoute, et la réponse à l'écoute
@@ -324,9 +349,9 @@ function couleurRegex(regSearch, valeurEcoute, inputAction) {
     inputAction.style.color = "white";
   }
 }
-
+//--------------------------------------------------------------
 // fonction d'affichage individuel des paragraphes sous input sauf pour l'input email
-
+//--------------------------------------------------------------
 function texteInfo(regex, pointage, zoneEcoute) {
       if (page.match("cart")) {
       zoneEcoute.addEventListener("input", (e) => {
@@ -349,9 +374,9 @@ function texteInfo(regex, pointage, zoneEcoute) {
     });
   }
 }
-
+//--------------------------------------------------------------
 // Fonction de validation/d'accés au clic du bouton du formulaire
-
+//--------------------------------------------------------------
 let commande = document.querySelector("#order");
 // la fonction sert à valider le clic de commande de manière interactive
 function valideClic() {
@@ -366,9 +391,9 @@ function valideClic() {
     document.querySelector("#order").setAttribute("value", "Remplir le formulaire");
   }
 }
-
+//----------------------------------------------------------------
 // Envoi de la commande
-
+//----------------------------------------------------------------
 if (page.match("cart")) {
   commande.addEventListener("click", (e) => {
     // empeche de recharger la page on prévient le reload du bouton
@@ -377,8 +402,9 @@ if (page.match("cart")) {
     envoiPaquet();
   });
 }
-
+//----------------------------------------------------------------
 // fonction récupérations des id puis mis dans un tableau
+//----------------------------------------------------------------
 // définition du panier quine comportera que les id des produits choisi du local storage
 let panierId = [];
 function tableauId() {
@@ -394,8 +420,9 @@ if (panier && panier.length > 0) {
   document.querySelector("#order").setAttribute("value", "Panier vide!");
 }
 }
-
+//----------------------------------------------------------------
 // fonction récupération des donnée client et panier avant transformation
+//----------------------------------------------------------------
 let contactRef;
 let commandeFinale;
 function paquet() {
@@ -412,8 +439,9 @@ function paquet() {
     products: panierId,
   };
 }
-
+//----------------------------------------------------------------
 // fonction sur la validation de l'envoi
+//----------------------------------------------------------------
 function envoiPaquet() {
   tableauId();
   paquet();
