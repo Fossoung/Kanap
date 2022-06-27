@@ -98,6 +98,9 @@ function modifQuantité() {
     cart.addEventListener("change", (eq) => {
       // vérification d'information de la valeur du clic et son positionnement dans les articles
       let panier = JSON.parse(localStorage.getItem("panierStocké"));
+       // Ramène la quantité à 1 si l'utilisateur a saisi 0. Ramène à 100 si l'utilisateur a saisi un nombre > 100.
+    if ((eq.target.value < 1) || (eq.target.value > 100))
+    eq.target.value = Math.max(1, Math.min(100, eq.target.value));
       // boucle pour modifier la quantité du produit du panier grace à la nouvelle valeur
       for (article of panier)
         if (

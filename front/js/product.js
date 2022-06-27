@@ -19,7 +19,7 @@ fetch("http://localhost:3000/api/products")
 // Création d'objet articleClient
 // déclaration objet articleClient prêt à être modifiée par les fonctions suivantes d'évènements
 let articleClient = {};
-// id du procuit
+// id du produit
 articleClient._id = id;
 // fonction d'affichage du produit de l'api
 function lesProduits(produit) {
